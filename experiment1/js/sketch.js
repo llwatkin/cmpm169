@@ -20,8 +20,8 @@ const circleMod = 3;
 let bongoLoop, tambourineLoop;
 
 function preload() {
-  bongoLoop = loadSound('./bongo_loop.mp3');
-  tambourineLoop = loadSound('./tambourine_loop.mp3');
+  bongoLoop = loadSound('bongo_loop.mp3');
+  tambourineLoop = loadSound('tambourine_loop.mp3');
 }
 
 function modifySound(sound, x, y) {

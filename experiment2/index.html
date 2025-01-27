@@ -1,70 +1,99 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<!-- This title is used for tabs and bookmarks -->
-	<title>Experiment X - Subject/Topic</title>
+	<head>
+		<!-- This title is used for tabs and bookmarks -->
+		<title>Experiment X - Subject/Topic</title>
 
-	<!-- Use UTF character set, a good idea with any webpage -->
-	<meta charset="UTF-8" />
-	<!-- Set viewport so page remains consistently scaled w narrow devices -->
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<!-- Use UTF character set, a good idea with any webpage -->
+		<meta charset="UTF-8" />
+		<!-- Set viewport so page remains consistently scaled w narrow devices -->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-	<!-- Include CSS file, including a site-wide CSS and for this particular page -->
-	<link rel="stylesheet" type="text/css" href="../css/site.css">
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+		<!-- Include CSS file, including a site-wide CSS and for this particular page -->
+		<link rel="stylesheet" type="text/css" href="../css/site.css">
+		<link rel="stylesheet" type="text/css" href="css/style.css">
 
-	<!-- Load jQuery library -->
-	<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-        crossorigin="anonymous"></script>
-	<!-- Load p5.js library -->
-	<script src="https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/p5.js"></script>
+		<!-- Load jQuery library -->
+		<script
+			src="https://code.jquery.com/jquery-3.7.1.min.js"
+			integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+			crossorigin="anonymous"
+		></script>
+		<!-- Load p5.js library -->
+		<script src="https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/p5.js"></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/addons/p5.sound.min.js"
+		></script>
+		<script type="text/javascript" src="./js/sketch.js" DEFER></script>
+	</head>
+	<body>
+		<!-- Style this page by changing the CSS in ../css/site.css or css/experiment.css -->
+		<main id="content">
+			<section>
+				<h1>Experiment 2 - Generative Methods</h1>
 
-	<!-- Link to javascript files - DEFER waits until all elements are rendered -->
-    <script type="text/javascript" src="../js/site.js" DEFER></script>
-	<!-- Use me for a JavaScript OOP Project -->
-	<script type="text/javascript" src="./js/project.js" DEFER></script>
-	<!-- Use me for a p5.js project -->
-	<script type="text/javascript" src="./js/sketch.js" DEFER></script>
-</head>
-<body>
-	<!-- Style this page by changing the CSS in ../css/site.css or css/experiment.css -->
-	<main id="content">
-		<section>
-
-			<h1>Experiment X - Subject/Topic</h1>
-
-			<div class="minor-section">
-				<div id="canvas-container">
-					<!-- canvas will be added here -->
+				<div class="minor-section">
+					<div id="canvas-container">
+						<canvas id="experiment"></canvas>
+						<div id="controls">
+							<input type="range" id="symmetry" min="2" max="6" step="1"></slider>
+							<input type="range" id="zoom" min="50" max="120" step="10"></slider>
+							<input type="range" id="weight" min="2" max="6" step="1"></slider>
+						</div>
+					</div>
+					<div class="fullscreen-box">
+						<button id="fullscreen">Fullscreen</button>
+					</div>
 				</div>
-                <div class="fullscreen-box">
-                    <button id="fullscreen">Fullscreen</button>
-                </div>
-			</div>
 
-			<div class="minor-section">
-				<h2>Description</h2>
-				<p>What are you trying to acomplish with this experiment?</p>
-			</div>
+				<div class="minor-section">
+					<h2>Description</h2>
+					<p>
+						My goal for this experiment was to create a digital kaleidoscope of a fractal pattern.<br>
+						<br>
+						<b>Controls</b>
+						<br>
+						Mouse: move to the right to rotate the kaleidoscope to the right, and left to rotate it to the left<br>
+						Sliders: play with the sliders to change qualities of the kaleidoscope<br>
+						S: save canvas as a png<br>
+						<br>
+						<b>Credits</b>
+						<br>
+						PaperTwist2.wav by SunnySideSound -- <a href="https://freesound.org/s/67788/">https://freesound.org/s/67788/</a> -- License: Attribution 4.0
+					</p>
+				</div>
 
-			<div class="minor-section">
-				<h2>Technical</h2>
-				<p>Describe in detail what you did technically and how it works?</p>
-			</div>
+				<div class="minor-section">
+					<h2>Technical</h2>
+					<p>
+						I found a simple recursive tree algorithm and used it as the base pattern for the kaleidoscope.
+						The canvas is divided up into a series of radial segments, from which these trees are drawn.
+						Each tree is drawn recursively, sprouting from the center of a particular point on the canvas, and its 
+						accompanying reflection is drawn, facing the opposite direction. Several of these radial trees
+						are drawn in various points on the canvas. When the mouse moves, the angle by which each branch
+						in each tree is rotated changes.
+					</p>
+				</div>
 
-			<div class="minor-section">
-				<h2>Reflection</h2>
-				<p>Each person that worked on the code should reflect on the process, the difficulties, and the successes of the experiment.</p>
-			</div>
-
-		</section>
-		<nav id="links" class="minor-section">
-			<!-- Put link back to homepage here. -->
-            <ul>
-                <li><a href="../index.html">Home</a></li>
-            </ul>
-		</nav>
-	</main>
-</body>
+				<div class="minor-section">
+					<h2>Reflection</h2>
+					<p>
+						I worked by myself on this project. The experience went a lot smoother than I had expected, and 
+						certainly smoother than the last experiment. I had a clear vision from the beginning and I feel 
+						that I accomplished exactly what I set out to do. Of course, there were problems initially with 
+						figuring out how to use pop and push to save and restore coordinate systems, so that made starting 
+						out particularly frustrating. Once I was able to produce something that looked close to what I 
+						envisioned, I got past that hurdle and spent the rest of my time experimenting almost completely 
+						free of frustration.
+					</p>
+				</div>
+			</section>
+			<nav id="links" class="minor-section">
+				<!-- Put link back to homepage here. -->
+				<ul>
+					<li><a href="../index.html">Home</a></li>
+				</ul>
+			</nav>
+		</main>
+	</body>
 </html>
