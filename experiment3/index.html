@@ -1,70 +1,140 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<!-- This title is used for tabs and bookmarks -->
-	<title>Experiment X - Subject/Topic</title>
+	<head>
+		<!-- This title is used for tabs and bookmarks -->
+		<title>Experiment 3 - Images, Video, & Sound Art</title>
 
-	<!-- Use UTF character set, a good idea with any webpage -->
-	<meta charset="UTF-8" />
-	<!-- Set viewport so page remains consistently scaled w narrow devices -->
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<!-- Use UTF character set, a good idea with any webpage -->
+		<meta charset="UTF-8" />
+		<!-- Set viewport so page remains consistently scaled w narrow devices -->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-	<!-- Include CSS file, including a site-wide CSS and for this particular page -->
-	<link rel="stylesheet" type="text/css" href="../css/site.css">
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+		<!-- Include CSS file, including a site-wide CSS and for this particular page -->
+		<link rel="stylesheet" type="text/css" href="../css/site.css">
+		<link rel="stylesheet" type="text/css" href="css/style.css">
 
-	<!-- Load jQuery library -->
-	<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-        crossorigin="anonymous"></script>
-	<!-- Load p5.js library -->
-	<script src="https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/p5.js"></script>
+		<!-- Load jQuery library -->
+		<script
+			src="https://code.jquery.com/jquery-3.7.1.min.js"
+			integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+			crossorigin="anonymous"
+		></script>
+		<!-- Load p5.js library -->
+		<script src="https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/p5.js"></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/addons/p5.sound.min.js"
+		></script>
+		<script type="text/javascript" src="./js/sketch.js" DEFER></script>
+	</head>
+	<body>
+		<!-- Style this page by changing the CSS in ../css/site.css or css/experiment.css -->
+		<main id="content">
+			<section>
+				<h1>
+					Experiment 3 - Images, Video, & Sound Art: Put Yourself
+					Together
+				</h1>
 
-	<!-- Link to javascript files - DEFER waits until all elements are rendered -->
-    <script type="text/javascript" src="../js/site.js" DEFER></script>
-	<!-- Use me for a JavaScript OOP Project -->
-	<script type="text/javascript" src="./js/project.js" DEFER></script>
-	<!-- Use me for a p5.js project -->
-	<script type="text/javascript" src="./js/sketch.js" DEFER></script>
-</head>
-<body>
-	<!-- Style this page by changing the CSS in ../css/site.css or css/experiment.css -->
-	<main id="content">
-		<section>
-
-			<h1>Experiment X - Subject/Topic</h1>
-
-			<div class="minor-section">
-				<div id="canvas-container">
-					<!-- canvas will be added here -->
+				<div class="minor-section">
+					<div id="canvas-container">
+						<canvas id="experiment"></canvas>
+					</div>
+					<div class="fullscreen-box">
+						<button id="fullscreen">Fullscreen</button>
+					</div>
 				</div>
-                <div class="fullscreen-box">
-                    <button id="fullscreen">Fullscreen</button>
-                </div>
-			</div>
 
-			<div class="minor-section">
-				<h2>Description</h2>
-				<p>What are you trying to acomplish with this experiment?</p>
-			</div>
+				<div class="minor-section">
+					<h2>Description</h2>
+					<p>
+						<b>Put Yourself Together</b>
+						<br>
+						<br>
+						For this experiment, my goal was to create a moving
+						puzzle from live video feed.<br>
+						<br>
+						<b>Controls</b>
+						<br>
+						Mouse: click and drag puzzle pieces to move them
+						around<br>
+						<br>
+						<b>Credits</b>
+						<br>
+						Click10.wav by stijn -- <a
+							href="https://freesound.org/s/43676/"
+						>https://freesound.org/s/43676/</a> -- License: Creative
+						Commons 0<br>
+						Chest Thump by iamaviolin -- <a
+							href="https://freesound.org/s/437433/"
+						>https://freesound.org/s/437433/</a> -- License:
+						Attribution 3.0<br>
+						Glass Pick Up.wav by kelsey_w -- <a
+							href="https://freesound.org/s/467058/"
+						>https://freesound.org/s/467058/</a> -- License:
+						Attribution 3.0<br>
+						heart beat lav mic by martian -- <a
+							href="https://freesound.org/s/787636/"
+						>https://freesound.org/s/787636/</a> -- License:
+						Creative Commons 0<br>
+						Computer Glitching, Digital Data Corruption, 02-04
+						LOOP.wav by InspectorJ --
+						<a href="https://freesound.org/s/573189/"
+						>https://freesound.org/s/573189/</a> -- License:
+						Attribution 4.0<br>
+						Bottle Shattering by Vhuma -- <a
+							href="https://freesound.org/s/708248/"
+						>https://freesound.org/s/708248/</a> -- License:
+						Attribution NonCommercial 4.0
+					</p>
+				</div>
 
-			<div class="minor-section">
-				<h2>Technical</h2>
-				<p>Describe in detail what you did technically and how it works?</p>
-			</div>
+				<div class="minor-section">
+					<h2>Technical</h2>
+					<p>
+						There are two main classes: Puzzle and Piece. The Puzzle
+						stores an array of pieces and an array of grid positions
+						that the pieces start out in. Each piece is drawn by
+						copying a portion of the input capture. Pieces store
+						variables such as a boolean describing whether it is
+						snapped somewhere on the grid, a goal position to lerp
+						to, and a "wrongness" value (calculated by getting the
+						distance between its original location and its current
+						location), among others. The Puzzle class includes a
+						function to sum up all of these wrongness values, which
+						is then used to modify the sound of the scene and the
+						frequency at which pieces break off. Whenever a piece is
+						set to break off, there is a chance that the entire
+						puzzle shatters, with every piece snapped to the grid
+						breaking off and flying to a random location. This
+						chance increases the higher the total wrongness value
+						is.
+					</p>
+				</div>
 
-			<div class="minor-section">
-				<h2>Reflection</h2>
-				<p>Each person that worked on the code should reflect on the process, the difficulties, and the successes of the experiment.</p>
-			</div>
-
-		</section>
-		<nav id="links" class="minor-section">
-			<!-- Put link back to homepage here. -->
-            <ul>
-                <li><a href="../index.html">Home</a></li>
-            </ul>
-		</nav>
-	</main>
-</body>
+				<div class="minor-section">
+					<h2>Reflection</h2>
+					<p>
+						In the beginning, I had so much trouble thinking of an
+						idea for this project. Even when I thought of building a
+						video puzzle, I wasn't too inspired. But as I
+						experimented more, I kept getting new ideas and the
+						project really started to take form. One of the highs of
+						the process was the moment when I accidentally made the
+						puzzle very difficult to put back together. It was a
+						happy accident that shaped all of my decisions after the
+						fact. Although I had a lot of issues during the process,
+						most of them I was able to fix quickly after some
+						thinking or research online. It took a lot of time and
+						work, but I think it was well worth it.
+					</p>
+				</div>
+			</section>
+			<nav id="links" class="minor-section">
+				<!-- Put link back to homepage here. -->
+				<ul>
+					<li><a href="../index.html">Home</a></li>
+				</ul>
+			</nav>
+		</main>
+	</body>
 </html>
