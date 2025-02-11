@@ -44,7 +44,7 @@ function setup() {
   noStroke();
   colorMode(HSB);
   
-  drone.setVolume(0.1);
+  drone.setVolume(0.2);
   clink.setVolume(0.5);
   
   drone.loop(true);

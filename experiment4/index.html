@@ -46,9 +46,8 @@
 				<div class="minor-section">
 					<h2>Description</h2>
 					<p>
-						For this experiment, my goal was to create an
-						interactive simulation inspired by the three-body
-						problem.<br>
+						For this experiment, my goal was to create a simulation
+						inspired by the three-body problem.<br>
 						<br>
 						<b>Controls</b>
 						<br>
@@ -68,7 +67,19 @@
 				<div class="minor-section">
 					<h2>Technical</h2>
 					<p>
-						Text here
+						Each body had a mass and starts out with a random
+						position and velocity. Every body exerts gravitational
+						force on every other body according to this mass. There
+						is collision detection for the walls of the cube. When a
+						body collides with a wall, a "ripple" is spawned, which
+						simply grows in radius and decreases in brightness every
+						frame. When its brightness is 0, it is removed from the
+						array of ripples to draw. Additionally, all bodies keep
+						a small array of positions from which lines are drawn to
+						form their paths. The stroke width of these lines
+						decreases with every subsequent line drawn, creating the
+						taper effect. The brightness of the lines also
+						decreases, thus tapering the color as well.
 					</p>
 				</div>
 
