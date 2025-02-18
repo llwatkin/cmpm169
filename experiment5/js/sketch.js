@@ -1,6 +1,6 @@
-// sketch.js - Experiment 4: 3D Graphics
+// sketch.js - Experiment 5: Grammars & Text Art
 // Author: Lyle Watkins
-// Date: 2/10/2025
+// Date: 2/17/2025
 
 const htmlCanvas = document.getElementById("experiment");
 
@@ -8,11 +8,13 @@ const htmlCanvas = document.getElementById("experiment");
 const SIZE = 15;
 const CHARS = ["-", "•", "+", "o", "0", "O", "●", "⬤"];
 const STORM_CHANCE_FREQ = 3600; // # of frames in between random rain frequency change
+const MIN_RAIN_FREQ = 1;
+const MAX_RAIN_FREQ = 120;
 const SUN_CHANGE_SPEED = 0.005;
 
 // Globals
 let pond;
-let rainFreq = 120; // # of frames in between drops
+let rainFreq = 120; // maximum # of frames in between drops
 let rainCounter = 0;
 let stormCounter = 0;
 let sunLevel = 80;
@@ -39,7 +41,7 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(~~(windowWidth / SIZE) * SIZE, ~~(windowHeight / SIZE) * SIZE);
+  createCanvas(1800, 600, htmlCanvas);
   colorMode(HSB);
   frameRate(60);
   noStroke();
@@ -71,15 +73,13 @@ function draw() {
   rainCounter--;
   
   if (stormCounter <= 0) {
-    rainFreq = random(10, 120);
+    rainFreq = random(MIN_RAIN_FREQ, MAX_RAIN_FREQ);
     stormCounter = STORM_CHANCE_FREQ;
     
     // Calculate new goal sun level
-    goalSunLevel = map(rainFreq, 10, 120, 20, 80);
+    goalSunLevel = map(rainFreq, MIN_RAIN_FREQ, MAX_RAIN_FREQ, 20, 80);
   }
   stormCounter--;
-  
-  
 }
 
 class Pond {
@@ -107,8 +107,8 @@ class Pond {
       ripple.size += 1;
       ripple.thresh += 0.002;
       
-      // Remove ripples once they are too large to see
-      if (ripple.size > width) {
+      // Remove ripples once they have disappeared
+      if (ripple.thresh >= 1) {
         let index = this.ripples.indexOf(ripple);
         this.ripples.splice(index, 1);
       }
@@ -151,7 +151,6 @@ class Pond {
     // Draw and update droplets
     for (let droplet of this.droplets) droplet.draw();
     this.updateDroplets();
-    
   }
 }
 
