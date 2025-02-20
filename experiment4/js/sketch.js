@@ -4,171 +4,304 @@
 
 const htmlCanvas = document.getElementById("experiment");
 
-// Constants
-const SIZE = 15;
-const CHARS = ["-", "•", "+", "o", "0", "O", "●", "⬤"];
-const STORM_CHANCE_FREQ = 3600; // # of frames in between random rain frequency change
-const SUN_CHANGE_SPEED = 0.005;
+const INIT_DISTANCE = 150; // Initial distance from center
+const BOX_SIZE = 400;
+const NUM_BODIES = 3;
+const G = 6.67e-11; // Gravitational constant
+const MASS = 10e12;
+const SCALE = 1e-5;
+const SPEED = 0.05;
+const DAMPEN = 0.8;
 
-// Globals
-let pond;
-let rainFreq = 120; // # of frames in between drops
-let rainCounter = 0;
-let stormCounter = 0;
-let sunLevel = 80;
-let goalSunLevel = sunLevel;
+let simulation;
 
-// Sounds
-let ambiance;
-let water;
-let splash1;
-let splash2;
-let splash3;
-let splash4;
-let splash5;
-let splashes;
+let drone;
+let clink;
+let noteA;
+let noteB;
+let noteC;
+let noteD;
+let noteE;
+
+let notes;
 
 function preload() {
-  ambiance = loadSound('ambiance.mp3');
-  water = loadSound('water.mp3');
-  splash1 = loadSound('splash1.mp3');
-  splash2 = loadSound('splash2.mp3');
-  splash3 = loadSound('splash3.mp3');
-  splash4 = loadSound('splash4.mp3');
-  splash5 = loadSound('splash5.mp3');
+  drone = loadSound('drone.mp3');
+  clink = loadSound('clink.mp3');
+  noteA = loadSound('noteA.mp3');
+  noteB = loadSound('noteB.mp3');
+  noteC = loadSound('noteC.mp3');
+  noteD = loadSound('noteD.mp3');
+  noteE = loadSound('noteE.mp3');
 }
 
 function setup() {
-  createCanvas(~~(windowWidth / SIZE) * SIZE, ~~(windowHeight / SIZE) * SIZE);
-  colorMode(HSB);
+  createCanvas(600, 600, WEBGL, htmlCanvas);
+  layer = createFramebuffer();
+  background(0);
   frameRate(60);
+  angleMode(DEGREES);
   noStroke();
-  textFont("Century Schoolbook", SIZE);
+  colorMode(HSB);
   
-  ambiance.setVolume(0.25);
-  ambiance.loop(true);
-  water.setVolume(0);
-  water.loop(true);
-
-  splashes = [splash1, splash2, splash3, splash4, splash5];
-  for (let splash of splashes) { 
-    splash.setVolume(0.01);      
-    splash.rate(0.9);
-  }
-  pond = new Pond();
+  drone.setVolume(0.2);
+  clink.setVolume(0.5);
+  
+  drone.loop(true);
+  
+  notes = [noteA, noteB, noteC, noteD, noteE];
+  simulation = new Simulation();
 }
 
 function draw() {
-  sunLevel = lerp(sunLevel, goalSunLevel, SUN_CHANGE_SPEED);
-  background(200, 100, sunLevel);
-  fill(200, constrain(sunLevel - 40, 0, 40), sunLevel + 20);
-  pond.draw();
+  background(0);
+
+  simulation.step();
+  simulation.draw();
   
-  if (rainCounter <= 0) {
-    pond.dropDroplet({x: random(0, width), y: random(0, height)});
-    rainCounter = random(1, rainFreq);
-  }
-  rainCounter--;
+  // Draw cube
+  push();
+  noFill();
+  stroke(255);
+  strokeWeight(3);
+  box(BOX_SIZE, BOX_SIZE, BOX_SIZE);
+  pop();
   
-  if (stormCounter <= 0) {
-    rainFreq = random(10, 120);
-    stormCounter = STORM_CHANCE_FREQ;
-    
-    // Calculate new goal sun level
-    goalSunLevel = map(rainFreq, 10, 120, 20, 80);
-  }
-  stormCounter--;
-  
-  
+  orbitControl();
 }
 
-class Pond {
+class Simulation {
   constructor() {
-    this.data = new Array(width/SIZE*height/SIZE).fill().map(_ => 0);
+    this.bodies = [];
     this.ripples = [];
-    this.droplets = [];
-  }
-  
-  dropDroplet(pos) {
-    let droplet = new Droplet(createVector(pos.x, pos.y));
-    this.droplets.push(droplet);
-    random(splashes).play();
     
-    this.createRipple(pos);
+    // Create bodies
+    let pos = createVector(random(-1, 1), random(-1, 1), 0).setMag(INIT_DISTANCE); // Initial position
+    let vel = createVector(random(-0.5, 0.5), 0, 0); // Initial velocity
+    for (let i = 0; i < NUM_BODIES; i++) {
+      // Choose a random note and remove it from the notes array
+      let randNote = random(notes);
+      notes.splice(notes.indexOf(randNote), 1);
+      
+      // Create body and add it to bodies array
+      let body = new Body(MASS, pos, vel, {h: i * 360 / NUM_BODIES, s: 100, b: 100}, randNote);
+      this.bodies.push(body);
+      
+      // Rotate position and velocity to get next body's position and velocity
+      pos = p5.Vector.rotate(pos, 360 / NUM_BODIES).setMag(INIT_DISTANCE);
+      pos.z = random(-INIT_DISTANCE, INIT_DISTANCE);
+      vel = p5.Vector.rotate(vel, 360 / NUM_BODIES);
+    }
   }
   
-  createRipple(pos) {
-    let ripple = {pos: createVector(pos.x, pos.y), size: 1, thresh: 0.5};
-    this.ripples.push(ripple);
+  step() {
+    for (let body1 of this.bodies) {
+      // Apply force of other bodies to this body
+      let f = createVector(0, 0, 0);
+      for (let body2 of this.bodies) {
+        if (body1 != body2) {
+          // Calculate gravitational force according to inverse-square law
+          let r = body1.pos.dist(body2.pos);
+          let rx = body2.pos.x - body1.pos.x;
+          let ry = body2.pos.y - body1.pos.y;
+          let rz = body2.pos.z - body1.pos.z;
+          let fx = G * (body1.mass * body2.mass / r ** 2) * (rx / abs(rx));
+          let fy = G * (body1.mass * body2.mass / r ** 2) * (ry / abs(ry));
+          let fz = G * (body1.mass  *body2.mass / r ** 2) * (rz / abs(rz));
+          // Only add force if bodies are not touching
+          if (r > body1.rad + body2.rad) f.add(createVector(fx, fy, fz)); 
+        }
+      }
+      body1.applyForce(f);
+    }
+    
+    for (let body of this.bodies) {
+      body.update();
+      this.wallCheck(body);
+    }
   }
   
-  updateRipples() {
+  wallCheck(body) {
+    let ripple;
+    let col = {h: body.col.h, s: body.col.s, b: body.col.b};
+    
+    // Left wall
+    if (body.pos.x - body.rad < -BOX_SIZE/2) {
+      let nx = -1;
+      let p = 2 * (body.vel.x * nx) / body.mass;
+      let vx = body.vel.x - p * body.mass * nx;
+      let d = abs(-BOX_SIZE/2 - (body.pos.x - body.rad));
+      body.pos.x += d;
+      body.bounce(createVector(vx * DAMPEN, body.vel.y, body.vel.z));
+      // Create ripple effect
+      ripple = new Ripple(createVector(-BOX_SIZE/2, body.pos.y, body.pos.z), "y", 90, col);
+    }
+    
+    // Top wall
+    if (body.pos.y - body.rad < -BOX_SIZE/2) {
+      let ny = -1;
+      let p = 2 * (body.vel.y * ny) / body.mass;
+      let vy = body.vel.y - p * body.mass * ny;
+      let d = abs(-BOX_SIZE/2 - (body.pos.y - body.rad));
+      body.pos.y += d;
+      body.bounce(createVector(body.vel.x, vy * DAMPEN, body.vel.z));
+      // Create ripple effect
+      ripple = new Ripple(createVector(body.pos.x, -BOX_SIZE/2, body.pos.z), "x", 90, col);
+    }
+    
+    // Back wall
+    if (body.pos.z - body.rad < -BOX_SIZE/2) {
+      let nz = -1;
+      let p = 2 * (body.vel.z * nz) / body.mass;
+      let vz = body.vel.z - p * body.mass * nz;
+      let d = abs(-BOX_SIZE/2 - (body.pos.z - body.rad));
+      body.pos.z += d;
+      body.bounce(createVector(body.vel.x, body.vel.y, vz * DAMPEN));
+      // Create ripple effect
+      ripple = new Ripple(createVector(body.pos.x, body.pos.y, -BOX_SIZE/2), "x", 0, col);
+    }
+    
+    // Right wall
+    if (body.pos.x + body.rad > BOX_SIZE/2) {
+      let nx = 1;
+      let p = 2 * (body.vel.x * nx) / body.mass;
+      let vx = body.vel.x - p * body.mass * nx;
+      let d = (body.pos.x + body.rad) - BOX_SIZE/2;
+      body.pos.x -= d;
+      body.bounce(createVector(vx * DAMPEN, body.vel.y, body.vel.z));
+      // Create ripple effect
+      ripple = new Ripple(createVector(BOX_SIZE/2, body.pos.y, body.pos.z), "y", 90, col);
+    }
+    
+    // Bottom wall
+    if (body.pos.y + body.rad > BOX_SIZE/2) {
+      let ny = 1;
+      let p = 2 * (body.vel.y * ny) / body.mass;
+      let vy = body.vel.y - p * body.mass * ny;
+      let d = (body.pos.y + body.rad) - BOX_SIZE/2;
+      body.pos.y -= d;
+      body.bounce(createVector(body.vel.x, vy * DAMPEN, body.vel.z));
+      // Create ripple effect
+      ripple = new Ripple(createVector(body.pos.x, BOX_SIZE/2, body.pos.z), "x", 90, col);
+    }
+    
+    // Front wall
+    if (body.pos.z + body.rad > BOX_SIZE/2) {
+      let nz = 1;
+      let p = 2 * (body.vel.z * nz) / body.mass;
+      let vz = body.vel.z - p * body.mass * nz;
+      let d = (body.pos.z + body.rad) - BOX_SIZE/2;
+      body.pos.z -= d;
+      body.bounce(createVector(body.vel.x, body.vel.y, vz * DAMPEN));
+      // Create ripple effect
+      ripple = new Ripple(createVector(body.pos.x, body.pos.y, BOX_SIZE/2), "", 0, col);
+    }
+    
+    if (ripple) this.ripples.push(ripple);
+  }
+  
+  draw() {
+    for (let ripple of this.ripples) ripple.draw();
+    for (let body of this.bodies) body.draw();
+    
+    // If ripple has disappeared, remove it from the array
     for (let ripple of this.ripples) {
-      ripple.size += 1;
-      ripple.thresh += 0.002;
-      
-      // Remove ripples once they are too large to see
-      if (ripple.size > width) {
-        let index = this.ripples.indexOf(ripple);
-        this.ripples.splice(index, 1);
+      if (ripple.col.b <= 0) {
+        let i = this.ripples.indexOf(ripple);
+        this.ripples.splice(i, 1);
       }
     }
-  }
-  
-  updateDroplets() {
-    // Remove droplets once they are too small
-    for (let droplet of this.droplets) {
-      if (droplet.size < 0) {
-        let index = this.droplets.indexOf(droplet);
-        this.droplets.splice(index, 1);
-      }
-    }
-  }
-  
-  updateWaterSound() {
-    let sum = 0;
-    for (let i = 0; i < this.data.length; i++) sum += this.data[i];
-    let volume = map(sum, 0, this.data.length * CHARS.length, 0, 1);
-    water.setVolume(volume);
-  }
-  
-  draw() {
-    for(let i = 0; i < this.data.length; i ++){
-      text(CHARS[this.data[i]], i % (width/SIZE) * SIZE, Math.floor(i / (width/SIZE)) * SIZE);
-      let pointPos = createVector(i % (width/SIZE) * SIZE, Math.floor(i / (width/SIZE)) * SIZE);
-      this.data[i] = 0; // All data initialized to 0
-      
-      // Update ripple data
-      for (let ripple of this.ripples) {
-        let distance = ripple.pos.dist(pointPos) / ripple.size;
-        if (distance < 1 && distance > ripple.thresh) this.data[i] += 1;
-      }
-      if (this.data[i] > CHARS.length - 1) this.data[i] = CHARS.length - 1;
-	}
-    this.updateRipples();
-    this.updateWaterSound();
-    
-    // Draw and update droplets
-    for (let droplet of this.droplets) droplet.draw();
-    this.updateDroplets();
-    
   }
 }
 
-class Droplet {
-  constructor(pos) {
+class Body {
+  constructor(mass, pos, vel, col, note) {
     this.pos = pos;
-    this.size = 15;
-    this.speed = 0.5;
+    this.vel = vel;
+    this.acc = createVector(0, 0, 0);
+    this.mass = mass;
+    this.rad = sqrt(this.mass / PI) * SCALE;
+    this.path = [];
+    this.col = col;
+    this.note = note;
+    
+    this.path.push(createVector(this.pos.x, this.pos.y, this.pos.z));
+  }
+  
+  // Apply force according to Newton's 2nd law: F = M * A (A = F / M)
+  applyForce(f) {
+    this.acc.add(p5.Vector.div(f, this.mass));
+  }
+  
+  bounce(vel) {
+    this.vel = vel;
+    this.acc.set(0, 0, 0);
+    clink.play();
+    this.note.play();
+  }
+  
+  update() {
+    let deltaVel = p5.Vector.mult(this.acc, deltaTime * SPEED);
+    this.vel.add(deltaVel); // Change velocity by acceleration
+    this.pos.add(p5.Vector.mult(this.vel, deltaTime * SPEED)); // Change position by velocity
+    this.acc.set(0, 0, 0); // Reset acceleration each frame
+    this.addToPath();
+  }
+  
+  addToPath() {
+    this.path.push(createVector(this.pos.x, this.pos.y, this.pos.z));
+    if (this.path.length > round(this.rad * 2)) this.path.shift();
   }
   
   draw() {
-    circle(this.pos.x, this.pos.y, this.size);
-    this.size -= this.speed;
-    this.speed += 0.1;
+    // Draw path
+    push();
+    let weight = this.rad;
+    let b = this.col.b;
+    for (let i = this.path.length - 1; i > 0; i--) {
+      strokeWeight(weight);
+      stroke(this.col.h, this.col.s, b);
+      let p1 = this.path[i];
+      let p2 = this.path[i - 1];
+      line(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+      weight -= this.rad / this.path.length;
+      b -= 2;
+    }
+    pop();
+    
+    // Draw sphere
+    push();
+    fill(this.col.h, this.col.s, this.col.b);
+    translate(this.pos.x, this.pos.y, this.pos.z);
+    sphere(this.rad);
+    pop();
   }
 }
 
-function mouseClicked() {
-	pond.dropDroplet(createVector(mouseX, mouseY));
+class Ripple {
+  constructor(pos, dim, rot, col) {
+    this.pos = pos;
+    this.dim = dim;
+    this.rot = rot;
+    this.col = col;
+    this.rad = 1;
+  }
+  
+  draw() {
+    push();
+    translate(this.pos.x, this.pos.y, this.pos.z);
+    if (this.dim == "x") {
+      rotateX(this.rot);
+    } else if (this.dim == "y") {
+      rotateY(this.rot);
+    }
+    stroke(this.col.h, this.col.s, this.col.b);
+    strokeWeight(5);
+    noFill();
+    circle(0, 0, this.rad);
+    pop();
+    
+    this.rad += 4;
+    this.col.b -= 4;
+  }
 }
