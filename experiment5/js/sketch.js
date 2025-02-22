@@ -9,7 +9,7 @@ const SIZE = 15;
 const CHARS = ["-", "•", "+", "o", "0", "O", "●", "⬤"];
 const STORM_CHANCE_FREQ = 3600; // # of frames in between random rain frequency change
 const MIN_RAIN_FREQ = 1;
-const MAX_RAIN_FREQ = 120;
+const MAX_RAIN_FREQ = 120; // maximum # of frames rainFreq can be
 const SUN_CHANGE_SPEED = 0.005;
 
 // Globals
@@ -41,7 +41,7 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(1800, 600, htmlCanvas);
+  createCanvas(1200, 600, htmlCanvas);
   colorMode(HSB);
   frameRate(60);
   noStroke();

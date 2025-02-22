@@ -51,18 +51,61 @@
 						<br>
 						<b>Controls</b>
 						<br>
-						Mouse click: click anywhere on the pond to create a
-						droplet.<br>
+						Click anywhere on the pond to create a droplet.<br>
 						<br>
 						<b>Credits</b>
 						<br>
+						<a
+							href="https://freesound.org/people/gkillhour/sounds/267221/"
+						>Water Droplet.wav</a> by <a
+							href="https://freesound.org/people/gkillhour/"
+						>gkillhour</a> | License: <a
+							href="https://creativecommons.org/licenses/by/4.0/"
+						>Attribution 4.0</a>
+						<br>
+						<a
+							href="https://freesound.org/people/rolandasb/sounds/170513/"
+						>water_flowing_01_loop.wav</a> by <a
+							href="https://freesound.org/people/rolandasb/"
+						>rolandasb</a> | License: <a
+							href="http://creativecommons.org/publicdomain/zero/1.0/"
+						>Creative Commons 0</a>
+						<br>
+						<a
+							href="https://freesound.org/people/soundofsong/sounds/640782/"
+						>birds at lake loop.wav</a> by <a
+							href="https://freesound.org/people/soundofsong/"
+						>soundofsong</a> | License: <a
+							href="http://creativecommons.org/publicdomain/zero/1.0/"
+						>Creative Commons 0</a>
 					</p>
 				</div>
 
 				<div class="minor-section">
 					<h2>Technical</h2>
 					<p>
-						Text here
+						The entire canvas is divided up into a grid in which
+						each tile a character is drawn according to the data
+						value of that tile. The data values of every tile are
+						stored in an array, which is looped through to draw the
+						appropriate characters. Ripples are simple objects
+						consisting of a position vector, a size, and a threshold
+						value (this threshold value is used to give the ripple a
+						sort of wave effect, where it initially grows in
+						thickness, then decreases until it disappears). For
+						every tile in the grid, all ripples are looped through
+						and the tile's data value is added to according to where
+						it sits in relation to the ripple's position and size.
+						This is also where the threshold value is taken into
+						account. Spots where ripples overlap are added to
+						multiple times, resulting in new characters. The
+						droplets are simply vector circles that can be created
+						wherever the user clicks, and decrease in size until
+						they disappear. Every certain number of frames, there is
+						a chance the weather will change and the rain will pick
+						up or slow down. When it picks up, the colors darken and
+						become less saturated, and vice versa when it slows
+						down.
 					</p>
 				</div>
 
@@ -70,15 +113,17 @@
 					<h2>Reflection</h2>
 					<p>
 						This experiment was very difficult at first because I
-						did not have any ideas. Several days went by before I
-						got the inspiration and idea to do a ripple simulation.
-						The beginning of this process was by far the most
-						difficult part, because I didn't fully understand the
-						code of my inspiration at first. It took me a while to
-						figure out how to modify it to make ripples rather than
-						circles. Figuring that out was the high point of this
-						experience. After that, it was a lot of fun to
-						experiment with and evolve the concept.
+						did not have any ideas. Many days went by before I got
+						the idea to do a ripple simulation, inspired by <a
+							href="https://openprocessing.org/sketch/1098610"
+						>this metaballs project</a>. The beginning of this
+						process was by far the most difficult part, because I
+						didn't fully understand the code of my inspiration. It
+						took me a while to fully understand it and learn how to
+						modify it to make ripples rather than circles. Figuring
+						that out was the high point of this experience. After
+						that, it was a lot of fun to experiment with and evolve
+						the concept.
 					</p>
 				</div>
 			</section>
