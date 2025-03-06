@@ -23,21 +23,10 @@ let goalSunLevel = sunLevel;
 // Sounds
 let ambiance;
 let water;
-let splash1;
-let splash2;
-let splash3;
-let splash4;
-let splash5;
-let splashes;
 
 function preload() {
   ambiance = loadSound('ambiance.mp3');
   water = loadSound('water.mp3');
-  splash1 = loadSound('splash1.mp3');
-  splash2 = loadSound('splash2.mp3');
-  splash3 = loadSound('splash3.mp3');
-  splash4 = loadSound('splash4.mp3');
-  splash5 = loadSound('splash5.mp3');
 }
 
 function setup() {
@@ -52,11 +41,6 @@ function setup() {
   water.setVolume(0);
   water.loop(true);
 
-  splashes = [splash1, splash2, splash3, splash4, splash5];
-  for (let splash of splashes) { 
-    splash.setVolume(0.01);      
-    splash.rate(0.9);
-  }
   pond = new Pond();
 }
 
@@ -92,7 +76,6 @@ class Pond {
   dropDroplet(pos) {
     let droplet = new Droplet(createVector(pos.x, pos.y));
     this.droplets.push(droplet);
-    random(splashes).play();
     
     this.createRipple(pos);
   }
